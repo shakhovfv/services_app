@@ -35,10 +35,10 @@ module Api::V1::Addresses
 
     def check_buildings(buildings)
       buildings.each do |part|
-        unless part['district_id'].nil?
+        unless part['district_id'].nil? or part['district_id'].to_i == 0
           return false unless DistrictsController.check_exists(part['district_id'])
         end
-        unless part['jurisdiction_id'].nil?
+        unless part['jurisdiction_id'].nil? or part['jurisdiction_id'].to_i == 0
           return false unless Api::V1::Jurisdictions::JurisdictionsController.check_exists(
             part['jurisdiction_id']
           )

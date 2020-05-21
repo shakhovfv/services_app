@@ -70,9 +70,29 @@ module Api::V1::Jurisdictions
 
     private
 
+    def valid_json?(json)
+      JSON.parse(json)
+      return true
+    rescue JSON::ParserError => e
+      return false
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_jurisdiction
-      @jurisdiction = Jurisdiction.find(params[:id])
+      if valid_json? (params[:id])
+        data = JSON.parse(params[:id])
+        @address = Address.find_by(name: data['name'], location_type_id: data['location_type_id'].to_i, locality_id: data['locality_id'].to_i)
+
+        @address.buildings.each do |part|
+          if part['numbers'].include? data['building']
+            @jurisdiction = Jurisdiction.find(part['jurisdiction_id'])
+            break
+          end
+        end
+        
+      else
+        @jurisdiction = Jurisdiction.find(params[:id])
+      end
     end
 
     # Only allow a trusted parameter "white list" through.
